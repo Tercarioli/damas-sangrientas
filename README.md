@@ -1,8 +1,26 @@
-# LAST MOVE
+# LAST MOVE — V2: The Second Offering
 
 **THE BOARD TAKES MORE THAN PIECES.**
 
-Prototipo V1 jugable de damas inglesas y supervivencia corporal. Humano contra IA, sin backend, servicios ni recursos externos. Todo el arte se dibuja proceduralmente y el audio se sintetiza en el navegador.
+V2 jugable de damas inglesas y supervivencia corporal, con dirección artística pixel art. Humano contra IA, sin backend, servicios ni recursos externos. El tablero y los muñecos se dibujan proceduralmente; el escenario usa un fondo pixel art generado y guardado en el proyecto. El audio se sintetiza en el navegador.
+
+## Versiones
+
+- **V2:** https://tercarioli.github.io/damas-sangrientas/
+- **V1 conservada:** https://tercarioli.github.io/damas-sangrientas/v1/index.html
+- **Fuente original V1:** etiqueta Git `v1.0.0`, commit `002a7e6`.
+
+La V1 se conserva como una compilación estática independiente dentro de `public/v1/`; sus reglas, recursos y Worker permanecen intactos. V2 se desarrolló en la rama `codex/v2-pixel-art`.
+
+## Novedades de V2
+
+Escenario pixel art original basado en el KV aportado, tablero en perspectiva con texturas y fichas dibujadas en baja resolución, y medidores de sangre sobre placas oscuras legibles. Los muñecos están separados del escenario: cada extremidad perdida cae al basurero correspondiente y queda allí hasta el reinicio. Las capturas múltiples escalonan las caídas dentro de una sola animación.
+
+Las reglas, la IA, la sangre y los tiempos de turno son los mismos de V1. La proyección visual, las zonas de clic y el teclado comparten el mismo mapa del tablero. El fondo no tiene fichas ni amputaciones decorativas que contradigan el estado real de la partida.
+
+La escena se organiza en capas: fondo generado, luz ambiente, tablero/fichas Canvas, pistas nítidas, muñecos/basureros Canvas y UI de sangre. En móvil, tablero y paneles se apilan sin scroll horizontal. Los modos FULL / REDUCED / OFF se mantienen.
+
+Ver `docs/art/V2-ART-DIRECTION.md` para el asset, su prompt y las decisiones de renderizado.
 
 ## Ejecutar
 
@@ -46,7 +64,7 @@ Seleccioná **BEGIN THE GAME**. Controlás las fichas de hueso y comenzás. Clic
 | `src/game/ai.ts` | Minimax alfa-beta, ordenación de jugadas e iterative deepening con límite temporal. |
 | `src/game/ai.worker.ts` | Aísla la búsqueda en un Web Worker. |
 | `src/game/useGame.ts` | Control de fases, interacción de cadenas, temporizadores, ejecución de IA y reinicio. |
-| `src/render/` | Canvas del tablero, piezas, muñecos, texturas, pistas y movimiento. Fondo del tablero en caché. |
+| `src/render/` | Canvas del tablero, piezas, muñecos y basureros; proyección compartida con los clics; trayectorias de caída. Fondo del tablero en caché. |
 | `src/audio/sound.ts` | Audio procedural: madera, impactos, crujidos, goteo, corona, latido, muerte y victoria. |
 | `src/components/` | Tablero con capa accesible, paneles corporales y diálogos. |
 | `src/App.tsx`, `src/style.css` | Menú, escena, ajustes, ayuda, resultados y adaptación a pantallas pequeñas. |
@@ -69,13 +87,13 @@ El Worker se termina al salir o reiniciar. Los temporizadores y los ciclos de an
 
 ## Presentación y ajustes
 
-Dos muñecos de madera con juntas metálicas, extremidades persistentes sobre la mesa y vasos que reflejan la sangre real. Tablero de madera, fichas con relieve y coronas de metal. Cuatro niveles de percepción, viñeta pulsante y shock tras una lesión. Las pistas de jugadas están en una capa nítida y las coordenadas del ratón permanecen estables.
+Dos muñecos pixel art de madera con juntas metálicas, extremidades que caen y persisten dentro de basureros y vasos que reflejan la sangre real. Tablero de madera, fichas con relieve y coronas de metal. Cuatro niveles de percepción, viñeta pulsante y shock tras una lesión. Las pistas de jugadas están en una capa nítida y las coordenadas del ratón permanecen estables.
 
 Settings ofrece dificultad, sonido, volumen y efectos FULL / REDUCED / OFF. Los ajustes se guardan localmente. El audio se activa después de una interacción. No hay fuentes, imágenes ni archivos de sonido descargados durante la partida.
 
 ## Verificación
 
-- `npm test`: 38 pruebas de reglas, salud, prioridades de muerte, simetría humano/IA, empates, legalidad y no mutación de la IA, reinicio y límites de interpolación. Incluye tres partidas completas simuladas con invariantes de sangre y conservación de fichas.
+- `npm test`: 47 pruebas de reglas, salud, prioridades de muerte, simetría humano/IA, empates, legalidad y no mutación de la IA, reinicio y límites de interpolación. V2 agrega proyección/clics de las 64 casillas y trayectorias/acumulación en los basureros. Incluye tres partidas completas simuladas con invariantes de sangre y conservación de fichas.
 - `npm run build`: TypeScript y compilación de producción Vite.
 - Prueba manual en el navegador de Codex: menú, clics, respuesta del Worker, capturas, continuación de cadenas, heridas persistentes, dos partidas hasta muerte por sangrado (turnos 19 y 21), ajustes de dificultad/efectos/sonido, ayuda y reinicio a 100/100, cuerpos completos y 12 fichas por lado.
 
@@ -88,12 +106,13 @@ Editar `src/game/balance.ts`: `amputationDamage`, `amputationBleeding`, `aggrava
 - HARD apunta a 6 plies; puede completar menos según el equipo y la complejidad de la posición, respetando el presupuesto temporal.
 - Las caídas y los materiales son animación e ilustración 2D, sin simulación física de cuerpos rígidos.
 - Chrome y Safari son objetivos mediante APIs estándar; no se realizó una verificación manual independiente en Safari.
+- El escenario pixel art incluye un fondo generado de aproximadamente 2 MB, servido desde el propio sitio. Los objetos interactivos y los muñecos son capas independientes.
 - La partida no se guarda al cerrar o recargar; los ajustes sí. No hay multijugador ni historial reproducible de partidas.
 
 ## Publicación online desde GitHub
 
 Repositorio: https://github.com/Tercarioli/damas-sangrientas
 
-El flujo `.github/workflows/pages.yml` instala las dependencias fijadas, ejecuta las pruebas y compila antes de desplegar `dist/` en GitHub Pages. Cada actualización de `main` vuelve a publicar el juego si todas las comprobaciones pasan. También puede ejecutarse manualmente en la pestaña Actions.
+El flujo `.github/workflows/pages.yml` instala las dependencias fijadas, ejecuta las pruebas y compila antes de desplegar `dist/` en GitHub Pages. Los pull requests ejecutan las pruebas y la compilación sin desplegar. Cada actualización de `main` vuelve a publicar el juego si todas las comprobaciones pasan. También puede ejecutarse manualmente en la pestaña Actions.
 
 En Settings → Pages, la fuente debe ser **GitHub Actions**. GitHub Pages requiere que el plan de la cuenta permita publicar desde la visibilidad elegida para el repositorio. La configuración de Vite usa rutas relativas, incluidas las del Worker, para funcionar bajo el subdirectorio del repositorio.
