@@ -1,0 +1,16 @@
+export type Player = 'human' | 'ai';
+export type Position = { row: number; col: number };
+export type Piece = { id: string; player: Player; king: boolean };
+export type Board = (Piece | null)[][];
+export type Move = { from: Position; path: Position[]; captures: Position[] };
+export type CaptureSequence = Move;
+export type BodyPart = 'leftArm' | 'rightLeg' | 'rightArm' | 'leftLeg' | 'head';
+export type Injury = { part: BodyPart; aggravated: boolean };
+export type PlayerHealth = { blood: number; bleeding: number; lost: number; injuries: Injury[] };
+export type GamePhase = 'MENU' | 'PLAYING' | 'ANIMATING_MOVE' | 'ANIMATING_INJURY' | 'AI_THINKING' | 'GAME_OVER';
+export type EndReason = 'blood' | 'pieces' | 'blocked' | 'repetition' | 'quiet';
+export type GameResult = { winner: Player | null; reason: EndReason };
+export type GameSettings = { difficulty: 'EASY' | 'NORMAL' | 'HARD'; sound: boolean; volume: number; effects: 'FULL' | 'REDUCED' | 'OFF' };
+export type GameState = { board: Board; turn: Player; health: Record<Player, PlayerHealth>; turns: number; quietTurns: number; repetitions: Record<string, number>; result: GameResult | null };
+export const other = (p: Player): Player => p === 'human' ? 'ai' : 'human';
+export const same = (a: Position, b: Position) => a.row === b.row && a.col === b.col;
